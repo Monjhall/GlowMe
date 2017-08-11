@@ -1,11 +1,11 @@
 name: GlowMe
 main: io.github.monjhall.glowme.GlowMe
-version: 0.1.2
+version: 0.1.5
 author: Monjhall
 
 commands:
   glow:
     description: This command's function body needs to be filled out.
-    usage: /<command> [player] [color] [duration]
+    usage: /<command> [player] [duration] [color]
     permission: glowme.glow
     permission-message: You don't have <permission>
