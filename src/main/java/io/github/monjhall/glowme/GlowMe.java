@@ -63,7 +63,7 @@ public class GlowMe extends JavaPlugin {
 				// Verify that a proper color was provided.
 				ChatColor teamColor;
 				try {
-					teamColor = ChatColor.valueOf(args[1]);
+					teamColor = ChatColor.valueOf(args[1].toUpperCase());
 				} catch (IllegalArgumentException e) {
 					sender.sendMessage("Color must be one of the allowed scoreboard colors.");
 					return false;
@@ -71,6 +71,7 @@ public class GlowMe extends JavaPlugin {
 				
 				if (teamColor.isFormat()) {
 					sender.sendMessage("Color must be a color, not a format code.");
+					return false;
 				}
 				
 				setGlow((Player) sender, duration * 20, teamColor);
@@ -100,7 +101,7 @@ public class GlowMe extends JavaPlugin {
 				// Verify that a proper color was provided.
 				ChatColor teamColor;
 				try {
-					teamColor = ChatColor.valueOf(args[2]);
+					teamColor = ChatColor.valueOf(args[2].toUpperCase());
 				} catch (IllegalArgumentException e) {
 					sender.sendMessage("Color must be one of the allowed scoreboard colors.");
 					return false;
@@ -108,6 +109,7 @@ public class GlowMe extends JavaPlugin {
 				
 				if (teamColor.isFormat()) {
 					sender.sendMessage("Color must be a color, not a format code.");
+					return false;
 				}
 				
 				setGlow(target, duration * 20, teamColor);
