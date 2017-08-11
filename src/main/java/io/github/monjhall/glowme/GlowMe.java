@@ -1,31 +1,78 @@
 package io.github.monjhall.glowme;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scoreboard.*;
 
 public class GlowMe extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
+		
 		// This method should contain all the logic to be performed when the plugin is enabled.
 		
-		// Simple log of onEnable being invoked.
-		getLogger().info("onEnable has been invoked!");
+		// Create a scheduler to run tasks.
+		BukkitScheduler scheduler = getServer().getScheduler();
+		
+		// Schedule a task to be repeatedly run and create it.
+		scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
+			
+			@Override
+			public void run() {
+				
+				// Collection of all online players.
+				Collection<Player> onlinePlayers = (Collection<Player>) Bukkit.getServer().getOnlinePlayers();
+				
+				// Iterate through the collection of players, looking at their active effects.
+				for (Iterator<Player> playerIterator = onlinePlayers.iterator();
+						playerIterator.hasNext();) {
+					
+					// Create a collection of the current player's active effects.
+					Player activePlayer = playerIterator.next();
+					Collection<PotionEffect> playerActiveEffects = activePlayer.getActivePotionEffects();
+					
+					// Iterate through the current player's active effects, checking for the glowing effect.
+					for (Iterator<PotionEffect> effectsIterator = playerActiveEffects.iterator();
+							effectsIterator.hasNext();) {
+						
+						PotionEffect activeEffect = effectsIterator.next();
+						
+						// If the active effect is not glowing, continue.
+						if (activeEffect.getType() != PotionEffectType.getById(24)) {
+							continue;
+						}
+						
+						// If the glow is about to run out, remove the player from the team.
+						if (activeEffect.getDuration() < 20) {
+							
+							// Get the scoreboard manager, create a scoreboard, and set the new teams.
+							ScoreboardManager manager = Bukkit.getScoreboardManager();
+							Scoreboard mainBoard = manager.getMainScoreboard();
+							Team playerTeam = mainBoard.getPlayerTeam(activePlayer);
+							playerTeam.removePlayer(activePlayer);
+						}
+						
+					}
+				}
+			}
+		}, 0L, 20L);
 	}
 	
 	@Override 
 	public void onDisable() {
-		// This method should contain all the logic to be performed when the plugin is enabled.
-		
-		// Simple log of onDisable being invoked.
-		getLogger().info("onDisable has been invoked!");
+		// This method should contain all the logic to be performed when the plugin is disabled.
 	}
 	
 	@Override
@@ -156,4 +203,5 @@ public class GlowMe extends JavaPlugin {
 		// Apply the glow to the provided player.
 		glowEffect.apply(player);
 	}
+	
 }
