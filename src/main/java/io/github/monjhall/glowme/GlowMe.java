@@ -55,7 +55,7 @@ public class GlowMe extends JavaPlugin {
 						}
 						
 						// If the glow is about to run out, remove the player from the team.
-						if (activeEffect.getDuration() < 20) {
+						if (activeEffect.getDuration() <= 20) {
 							
 							// Get the scoreboard manager, create a scoreboard, and set the new teams.
 							ScoreboardManager manager = Bukkit.getScoreboardManager();
