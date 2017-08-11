@@ -1,7 +1,9 @@
 package io.github.monjhall.glowme;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class GlowMe extends JavaPlugin {
@@ -28,8 +30,19 @@ public class GlowMe extends JavaPlugin {
 		// If using the command glow...
 		if (cmd.getName().equalsIgnoreCase("glow")) {
 			
+			if (args.length != 3) {
+				sender.sendMessage("Wrong number of arguments.");
+				return false;
+			}
+			
+			Player target = (Bukkit.getServer().getPlayer(args[0]));
+			if (target == null) {
+				sender.sendMessage(args[0] + " is not online!");
+		        return false;
+			}
+			
 			// TODO: Fill out command functionality.
-			getLogger().info("Command used properly...");
+			sender.sendMessage("Functionality needs to be added to the method body.");
 			
 			return true;
 		}
