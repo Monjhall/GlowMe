@@ -43,8 +43,8 @@ public class checkActiveEffects extends BukkitRunnable {
 					continue;
 
 				// If the glow is about to run out, remove the player from the team.
-				if (activeEffect.getDuration() <= 15)
-					plugin.removePlayerFromTeam(activePlayer);
+				if (activeEffect.getDuration() <= 10)
+					plugin.clearGlow(activePlayer);
 
 			}
 		}
