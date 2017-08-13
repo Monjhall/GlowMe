@@ -1,11 +1,16 @@
 name: GlowMe
 main: io.github.monjhall.glowme.GlowMe
-version: 0.2.1
+version: 0.3.3
 author: Monjhall
 
 commands:
   glow:
-    description: This command's function body needs to be filled out.
+    description: Applies a glow to a specified player.
     usage: /<command> [player] [duration] [color]
     permission: glowme.glow
-    permission-message: You don't have <permission>
+    permission-message: You don't have <permission>.
+  clearglow:
+    description: Clears glow off of the specified player.
+    usage: /<command> [player]
+    permission: glowme.clearglow
+    permission-message: You don't have <permission>.
