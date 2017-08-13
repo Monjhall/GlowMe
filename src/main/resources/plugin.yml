@@ -1,6 +1,6 @@
 name: GlowMe
 main: io.github.monjhall.glowme.GlowMe
-version: 0.3.5
+version: 0.3.6
 author: Monjhall
 
 commands:
@@ -14,3 +14,16 @@ commands:
     usage: /<command> [player]
     permission: glowme.clearglow
     permission-message: You don't have <permission>.
+
+permissions:
+  glowme.*:
+    description: Gives access to all glowme commands.
+    children:
+      glowme.glow: true
+      glowme.clearglow: true
+  glowme.glow:
+    description: Gives access to the command for glow setting.
+    default: op
+  glowme.clearglow:
+    description: Gives access to the command for clearing your glow.
+    default: op

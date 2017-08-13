@@ -13,6 +13,9 @@ public class GlowMe extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		
+		// Load the configuration file.
+		this.loadConfiguration();
+		
 		// Set the commands to be executed by the command executor.
 		GlowMeCommandExecutor commandExecutor = new GlowMeCommandExecutor(this);
 		this.getCommand("glow").setExecutor(commandExecutor);
@@ -80,6 +83,12 @@ public class GlowMe extends JavaPlugin {
 		}
 		playerTeam.addPlayer(player);
 		playerTeam.setPrefix(color + "");
+	}
+	
+	public void loadConfiguration() {
+		
+		this.getConfig().options().copyDefaults(true);
+		this.saveConfig();
 	}
 	
 }
