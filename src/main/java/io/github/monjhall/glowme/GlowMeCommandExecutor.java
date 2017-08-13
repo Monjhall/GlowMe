@@ -47,6 +47,25 @@ public class GlowMeCommandExecutor implements CommandExecutor {
 					sender.sendMessage("Duration must be a number, proper usage below.");
 					return false;
 				}
+				
+				// Notify the user of any duration mistakes.
+				if (duration < -1) {
+					sender.sendMessage("Duration must be a value between 1 and 1500 or a value of -1.");
+					return false;
+				} else if (duration == 0) {
+					sender.sendMessage("Duration must be a value between 1 and 1500 or a value of -1."
+							+ "\nIf you are trying to clear a glow, use the /clearglow command.");
+					return false;
+				} else if (duration > 1500) {
+					sender.sendMessage("Duration must be a value between 1 and 1500 or a value of -1."
+							+ "\nIf you are trying to apply infinite glow, use a duration of -1.");
+					return false;
+				} else if (duration == -1) {
+					// Set duration to a large number so it'll be infinite.
+					duration = 100000;
+				} else {
+					// Do nothing...
+				}
 
 				// Verify that a proper color was provided.
 				ChatColor teamColor;

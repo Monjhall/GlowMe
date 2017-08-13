@@ -27,7 +27,7 @@ public class GlowMe extends JavaPlugin {
 		checkActiveEffectsTask.runTaskTimer(this, 0L, 5L);
 		
 		// Register the events.
-		this.getServer().getPluginManager().registerEvents(new playerListener(this), this);
+		this.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 	}
 
 	// This method should contain all the logic to be performed when the plugin is

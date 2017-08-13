@@ -15,12 +15,12 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-public final class playerListener implements Listener {
+public final class PlayerListener implements Listener {
 	
 	private final GlowMe plugin;
 	
 	// Constructor.
-	public playerListener (GlowMe plugin) {
+	public PlayerListener (GlowMe plugin) {
 		this.plugin = plugin;
 	}
 	
