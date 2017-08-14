@@ -1,6 +1,6 @@
 name: GlowMe
 main: io.github.monjhall.glowme.GlowMe
-version: 0.4.1
+version: 0.5.0
 author: Monjhall
 
 commands:

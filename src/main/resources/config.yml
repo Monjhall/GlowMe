@@ -1,0 +1,14 @@
+#############################################
+# Configuration file for the GlowMe plugin. #
+#############################################
+
+# Store all items you want players to glow for here.
+ItemCraft:
+  # Examples for items. Use material names from this list: https://jd.bukkit.org/org/bukkit/Material.html
+  DIAMOND_SWORD:
+    Color: AQUA
+    Duration: 30
+  DIAMOND_HOE:
+    Color: GREEN
+    Duration: 15
+  

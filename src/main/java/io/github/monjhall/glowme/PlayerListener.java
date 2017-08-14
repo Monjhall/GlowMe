@@ -27,10 +27,43 @@ public final class PlayerListener implements Listener {
 	// When an item is crafted, check if a glow should be applied and apply it!
 	@EventHandler
 	public void onItemCraft(CraftItemEvent event) {
-		plugin.getLogger().log(Level.INFO, event.getCurrentItem() + " has been made!");
-		if (event.getCurrentItem().getType() == Material.DIAMOND_SWORD) {
-			plugin.setGlow((Player) event.getWhoClicked(), 30, ChatColor.AQUA);
+		
+//		plugin.getLogger().log(Level.INFO, event.getCurrentItem() + " has been made!");
+//		if (event.getCurrentItem().getType() == Material.DIAMOND_SWORD) {
+//			plugin.setGlow((Player) event.getWhoClicked(), 30, ChatColor.AQUA);
+//		}
+		
+		// Check if the item is contained in the config file...
+		if (plugin.getConfig().contains("ItemCraft." + event.getCurrentItem().getType().toString())) {
+			
+			// Set the duration and color. Resorts to default values if it fails.
+			int duration = plugin.getConfig().getInt("ItemCraft." + event.getCurrentItem().getType().toString() + ".Duration");
+			ChatColor color = null;
+			
+			// Notify the user of any duration mistakes.
+			if (duration < -1 || duration == 0 || duration > 1500) {
+				plugin.getLogger().log(Level.CONFIG, "The duration for " + event.getCurrentItem() + " was incorrect! Fix this in the config!");
+				return;
+			} else if (duration == -1) {
+				// Set duration to a large number so it'll be infinite.
+				duration = 100000;
+			}
+			
+			// Try-Catch statement to make sure that the chat color is not null or incorrect.
+			try {
+				color = ChatColor.valueOf((plugin.getConfig().getString("ItemCraft." + event.getCurrentItem().getType().toString() + ".Color")).toUpperCase());
+			} catch (NullPointerException e) {
+				plugin.getLogger().log(Level.CONFIG, "The color for " + event.getCurrentItem() + " was null! Fix this in the config!");
+				return;
+			} catch (IllegalArgumentException e) {
+				plugin.getLogger().log(Level.CONFIG, "The color for " + event.getCurrentItem() + " was not an allowed color! Fix this in the config!");
+				return;
+			}
+			
+			// Set the glow for the player.
+			plugin.setGlow((Player) event.getWhoClicked(), duration, color);
 		}
+		
 	}
 	
 	// When an item is eaten, check if a glow should be applied and apply it! 

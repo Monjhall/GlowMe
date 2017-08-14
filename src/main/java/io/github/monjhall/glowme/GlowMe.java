@@ -92,8 +92,7 @@ public class GlowMe extends JavaPlugin {
 
 	public void loadConfiguration() {
 
-		this.getConfig().options().copyDefaults(true);
-		this.saveConfig();
+		this.saveDefaultConfig();
 	}
 
 }
