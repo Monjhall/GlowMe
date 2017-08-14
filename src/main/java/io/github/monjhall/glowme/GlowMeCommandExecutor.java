@@ -37,12 +37,24 @@ public class GlowMeCommandExecutor implements CommandExecutor {
 					return false;
 				}
 
-				// If the sender is a player, set the glow on the sender.
+				// Verify that a proper color was provided.
+				ChatColor teamColor;
+				try {
+					teamColor = ChatColor.valueOf(args[0].toUpperCase());
+				} catch (IllegalArgumentException e) {
+					sender.sendMessage("Color must be one of the allowed scoreboard colors.");
+					return false;
+				}
 
+				if (teamColor.isFormat()) {
+					sender.sendMessage("Color must be a color, not a format code.");
+					return false;
+				}
+				
 				// Verify duration is an integer, otherwise catch the exception.
 				int duration;
 				try {
-					duration = Integer.parseInt(args[0]);
+					duration = Integer.parseInt(args[1]);
 				} catch (NumberFormatException e) {
 					sender.sendMessage("Duration must be a number, proper usage below.");
 					return false;
@@ -67,20 +79,6 @@ public class GlowMeCommandExecutor implements CommandExecutor {
 					// Do nothing...
 				}
 
-				// Verify that a proper color was provided.
-				ChatColor teamColor;
-				try {
-					teamColor = ChatColor.valueOf(args[1].toUpperCase());
-				} catch (IllegalArgumentException e) {
-					sender.sendMessage("Color must be one of the allowed scoreboard colors.");
-					return false;
-				}
-
-				if (teamColor.isFormat()) {
-					sender.sendMessage("Color must be a color, not a format code.");
-					return false;
-				}
-
 				plugin.setGlow((Player) sender, duration, teamColor);
 			}
 
@@ -96,19 +94,10 @@ public class GlowMeCommandExecutor implements CommandExecutor {
 					return false;
 				}
 
-				// Verify duration is an integer, otherwise catch the exception.
-				int duration;
-				try {
-					duration = Integer.parseInt(args[1]);
-				} catch (NumberFormatException e) {
-					sender.sendMessage("Duration must be a number, proper usage below.");
-					return false;
-				}
-
 				// Verify that a proper color was provided.
 				ChatColor teamColor;
 				try {
-					teamColor = ChatColor.valueOf(args[2].toUpperCase());
+					teamColor = ChatColor.valueOf(args[1].toUpperCase());
 				} catch (IllegalArgumentException e) {
 					sender.sendMessage("Color must be one of the allowed scoreboard colors.");
 					return false;
@@ -117,6 +106,34 @@ public class GlowMeCommandExecutor implements CommandExecutor {
 				if (teamColor.isFormat()) {
 					sender.sendMessage("Color must be a color, not a format code.");
 					return false;
+				}
+				
+				// Verify duration is an integer, otherwise catch the exception.
+				int duration;
+				try {
+					duration = Integer.parseInt(args[2]);
+				} catch (NumberFormatException e) {
+					sender.sendMessage("Duration must be a number, proper usage below.");
+					return false;
+				}
+				
+				// Notify the user of any duration mistakes.
+				if (duration < -1) {
+					sender.sendMessage("Duration must be a value between 1 and 1500 or a value of -1.");
+					return false;
+				} else if (duration == 0) {
+					sender.sendMessage("Duration must be a value between 1 and 1500 or a value of -1."
+							+ "\nIf you are trying to clear a glow, use the /clearglow command.");
+					return false;
+				} else if (duration > 1500) {
+					sender.sendMessage("Duration must be a value between 1 and 1500 or a value of -1."
+							+ "\nIf you are trying to apply infinite glow, use a duration of -1.");
+					return false;
+				} else if (duration == -1) {
+					// Set duration to a large number so it'll be infinite.
+					duration = 100000;
+				} else {
+					// Do nothing...
 				}
 
 				plugin.setGlow(target, duration, teamColor);

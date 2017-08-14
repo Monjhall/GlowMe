@@ -1,12 +1,12 @@
 name: GlowMe
 main: io.github.monjhall.glowme.GlowMe
-version: 0.5.1
+version: 0.5.2
 author: Monjhall
 
 commands:
   glow:
     description: Applies a glow to a specified player.
-    usage: /<command> [player] [duration] [color]
+    usage: /<command> [player] [color] [duration]
     permission: glowme.glow
     permission-message: You don't have <permission>.
   clearglow:
