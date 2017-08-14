@@ -47,7 +47,7 @@ public class GlowMeCommandExecutor implements CommandExecutor {
 					sender.sendMessage("Duration must be a number, proper usage below.");
 					return false;
 				}
-				
+
 				// Notify the user of any duration mistakes.
 				if (duration < -1) {
 					sender.sendMessage("Duration must be a value between 1 and 1500 or a value of -1.");
