@@ -21,6 +21,7 @@ public class GlowMe extends JavaPlugin {
 		GlowMeCommandExecutor commandExecutor = new GlowMeCommandExecutor(this);
 		this.getCommand("glow").setExecutor(commandExecutor);
 		this.getCommand("clearglow").setExecutor(commandExecutor);
+		this.getCommand("setglowconfig").setExecutor(commandExecutor);
 
 		// Create the active effects task and repeatedly run it.
 		checkActiveEffects checkActiveEffectsTask = new checkActiveEffects(this);

@@ -1,25 +1,25 @@
-####################################################################################################
-#                                _____ _                 __  __                                    #
-#                               / ____| |               |  \/  |                                   #
-#                              | |  __| | _____      __ | \  / | ___                               #
-#                              | | |_ | |/ _ \ \ /\ / / | |\/| |/ _ \                              #
-#                              | |__| | | (_) \ V  V /  | |  | |  __/                              #
-#                               \_____|_|\___/ \_/\_/   |_|  |_|\___|                              #
-#                                                                                                  #
-#                                    GitHub.com/Monjhall/GlowMe                                    #
-#                                                                                                  #
-#                                Use material names from this list:                                #
-#                          https://jd.bukkit.org/org/bukkit/Material.html                          #
-#                                  Use color names from this list:                                 #
-#                          https://jd.bukkit.org/org/bukkit/ChatColor.html                         #
-#                                Use teleport causes from this list:                               #
-#       https://jd.bukkit.org/org/bukkit/event/player/PlayerTeleportEvent.TeleportCause.html       #
-#                                 Use entity types from this list:                                 #
-#                      https://jd.bukkit.org/org/bukkit/entity/EntityType.html                     #
-#                                                                                                  #
-####################################################################################################
-
-# Note all items you want players to glow for crafting here.
+# |-------------------------------------------------------------------------------------------------|
+# |                               _____ _                 __  __                                    |
+# |                              / ____| |               |  \/  |                                   |
+# |                             | |  __| | _____      __ | \  / | ___                               |
+# |                             | | |_ | |/ _ \ \ /\ / / | |\/| |/ _ \                              |
+# |                             | |__| | | (_) \ V  V /  | |  | |  __/                              |
+# |                              \_____|_|\___/ \_/\_/   |_|  |_|\___|                              |
+# |                                                                                                 |
+# |                                   GitHub.com/Monjhall/GlowMe                                    |
+# |                                                                                                 |
+# |                               Use material names from this list:                                |
+# |                         https://jd.bukkit.org/org/bukkit/Material.html                          |
+# |                                 Use color names from this list:                                 |
+# |                         https://jd.bukkit.org/org/bukkit/ChatColor.html                         |
+# |                               Use teleport causes from this list:                               |
+# |      https://jd.bukkit.org/org/bukkit/event/player/PlayerTeleportEvent.TeleportCause.html       |
+# |                                Use entity types from this list:                                 |
+# |                     https://jd.bukkit.org/org/bukkit/entity/EntityType.html                     |
+# |           All durations should be set between 0-1500, using -1 for infinite duration.           |
+# |                                                                                                 |
+# |-------------------------------------------------------------------------------------------------|
+#
 ItemCraft:
   DIAMOND_SWORD:
     Color: AQUA
@@ -28,7 +28,7 @@ ItemCraft:
     Color: BLUE
     Duration: 15
 
-# Note all items you want players to glow for eating here.
+
 ItemConsume:
   GOLDEN_APPLE:
     Color: YELLOW
@@ -37,19 +37,19 @@ ItemConsume:
     Color: GOLD
     Duration: 30
     
-# Note all items you want players to glow for picking up here.
+
 ItemPickup:
   DIAMOND:
     Color: AQUA
     Duration: 30
     
-# Note all teleport causes you want players to glow for here.
-TeleportCause:
+
+Teleport:
   ENDER_PEARL:
     Color: DARK_PURPLE
     Duration: 30
     
-# Note all entities you want players to glow for killing.
+
 EntityKilled:
   PLAYER:
     Color: RED

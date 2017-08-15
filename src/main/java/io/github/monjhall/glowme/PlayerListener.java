@@ -202,10 +202,10 @@ public final class PlayerListener implements Listener {
 	public void onEnderPearlTeleport(PlayerTeleportEvent event) {
 
 		// Check if the item is contained in the config file...
-		if (plugin.getConfig().contains("TeleportCause." + event.getCause().toString())) {
+		if (plugin.getConfig().contains("Teleport." + event.getCause().toString())) {
 
 			// Set the duration and color. Resorts to default values if it fails.
-			int duration = plugin.getConfig().getInt("TeleportCause." + event.getCause().toString() + ".Duration");
+			int duration = plugin.getConfig().getInt("Teleport." + event.getCause().toString() + ".Duration");
 			ChatColor color = null;
 
 			// Notify the user of any duration mistakes.
@@ -222,7 +222,7 @@ public final class PlayerListener implements Listener {
 			// incorrect.
 			try {
 				color = ChatColor.valueOf(
-						(plugin.getConfig().getString("TeleportCause." + event.getCause().toString() + ".Color"))
+						(plugin.getConfig().getString("Teleport." + event.getCause().toString() + ".Color"))
 								.toUpperCase());
 			} catch (NullPointerException e) {
 				plugin.getLogger().log(Level.CONFIG,
