@@ -9,7 +9,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
@@ -29,39 +28,36 @@ public final class PlayerListener implements Listener {
 		// Check if the item is contained in the config file...
 		if (plugin.getConfig().contains("ItemCraft." + event.getCurrentItem().getType().toString())) {
 
-			// Set the duration and color. Resorts to default values if it fails.
-			int duration = plugin.getConfig()
-					.getInt("ItemCraft." + event.getCurrentItem().getType().toString() + ".Duration");
-			ChatColor color = null;
+			// Variables for the method.
+			String configColor, configDuration;
+			configColor = plugin.getConfig()
+					.getString("ItemCraft." + event.getCurrentItem().getType().toString() + ".Color");
+			configDuration = Integer.toString(plugin.getConfig()
+					.getInt("ItemCraft." + event.getCurrentItem().getType().toString() + ".Duration"));
 
-			// Notify the user of any duration mistakes.
-			if (duration < -1 || duration == 0 || duration > 1500) {
-				plugin.getLogger().log(Level.CONFIG,
-						"The duration for " + event.getCurrentItem() + " was incorrect! Fix this in the config!");
+			// Verify the color using a ColorVerification.
+			ColorVerification colorVerification = new ColorVerification(configColor);
+
+			// If the color isn't valid, the post an error message and return false.
+			if (!colorVerification.getIsValid()) {
+				plugin.getLogger().log(Level.CONFIG, "The color for ItemCraft." + event.getCurrentItem()
+						+ " was incorrect! Fix this in the config!");
 				return;
-			} else if (duration == -1) {
-				// Set duration to a large number so it'll be infinite.
-				duration = 100000;
 			}
 
-			// Try-Catch statement to make sure that the chat color is not null or
-			// incorrect.
-			try {
-				color = ChatColor.valueOf((plugin.getConfig()
-						.getString("ItemCraft." + event.getCurrentItem().getType().toString() + ".Color"))
-								.toUpperCase());
-			} catch (NullPointerException e) {
-				plugin.getLogger().log(Level.CONFIG,
-						"The color for " + event.getCurrentItem() + " was null! Fix this in the config!");
-				return;
-			} catch (IllegalArgumentException e) {
-				plugin.getLogger().log(Level.CONFIG, "The color for " + event.getCurrentItem()
-						+ " was not an allowed color! Fix this in the config!");
+			// Verify the duration using a DurationVerification.
+			DurationVerification durationVerification = new DurationVerification(configDuration);
+
+			// If the duration isn't valid, then post an error message and return false.
+			if (!durationVerification.getIsValid()) {
+				plugin.getLogger().log(Level.CONFIG, "The duration for ItemCraft." + event.getCurrentItem()
+						+ " was incorrect! Fix this in the config!");
 				return;
 			}
 
 			// Set the glow for the player.
-			plugin.setGlow((Player) event.getWhoClicked(), duration, color);
+			plugin.setGlow((Player) event.getWhoClicked(), durationVerification.getVerifiedDuration(),
+					ChatColor.valueOf(colorVerification.getVerifiedColor()));
 		}
 
 	}
@@ -73,39 +69,36 @@ public final class PlayerListener implements Listener {
 		// Check if the item is contained in the config file...
 		if (plugin.getConfig().contains("ItemConsume." + event.getItem().getType().toString())) {
 
-			// Set the duration and color. Resorts to default values if it fails.
-			int duration = plugin.getConfig()
-					.getInt("ItemConsume." + event.getItem().getType().toString() + ".Duration");
-			ChatColor color = null;
+			// Variables for the method.
+			String configColor, configDuration;
+			configColor = plugin.getConfig()
+					.getString("ItemConsume." + event.getItem().getType().toString() + ".Color");
+			configDuration = Integer.toString(
+					plugin.getConfig().getInt("ItemConsume." + event.getItem().getType().toString() + ".Duration"));
 
-			// Notify the user of any duration mistakes.
-			if (duration < -1 || duration == 0 || duration > 1500) {
+			// Verify the color using a ColorVerification.
+			ColorVerification colorVerification = new ColorVerification(configColor);
+
+			// If the color isn't valid, the post an error message and return false.
+			if (!colorVerification.getIsValid()) {
 				plugin.getLogger().log(Level.CONFIG,
-						"The duration for " + event.getItem() + " was incorrect! Fix this in the config!");
+						"The color for ItemConsume." + event.getItem() + " was incorrect! Fix this in the config!");
 				return;
-			} else if (duration == -1) {
-				// Set duration to a large number so it'll be infinite.
-				duration = 100000;
 			}
 
-			// Try-Catch statement to make sure that the chat color is not null or
-			// incorrect.
-			try {
-				color = ChatColor.valueOf(
-						(plugin.getConfig().getString("ItemConsume." + event.getItem().getType().toString() + ".Color"))
-								.toUpperCase());
-			} catch (NullPointerException e) {
+			// Verify the duration using a DurationVerification.
+			DurationVerification durationVerification = new DurationVerification(configDuration);
+
+			// If the duration isn't valid, then post an error message and return false.
+			if (!durationVerification.getIsValid()) {
 				plugin.getLogger().log(Level.CONFIG,
-						"The color for " + event.getItem() + " was null! Fix this in the config!");
-				return;
-			} catch (IllegalArgumentException e) {
-				plugin.getLogger().log(Level.CONFIG,
-						"The color for " + event.getItem() + " was not an allowed color! Fix this in the config!");
+						"The duration for ItemConsume." + event.getItem() + " was incorrect! Fix this in the config!");
 				return;
 			}
 
 			// Set the glow for the player.
-			plugin.setGlow((Player) event.getPlayer(), duration, color);
+			plugin.setGlow((Player) event.getPlayer(), durationVerification.getVerifiedDuration(),
+					ChatColor.valueOf(colorVerification.getVerifiedColor()));
 		}
 
 	}
@@ -117,39 +110,36 @@ public final class PlayerListener implements Listener {
 		// Check if the item is contained in the config file...
 		if (plugin.getConfig().contains("ItemPickup." + event.getItem().getItemStack().getType().toString())) {
 
-			// Set the duration and color. Resorts to default values if it fails.
-			int duration = plugin.getConfig()
-					.getInt("ItemPickup." + event.getItem().getItemStack().getType().toString() + ".Duration");
-			ChatColor color = null;
+			// Variables for the method.
+			String configColor, configDuration;
+			configColor = plugin.getConfig()
+					.getString("ItemPickup." + event.getItem().getItemStack().getType().toString() + ".Color");
+			configDuration = Integer.toString(plugin.getConfig()
+					.getInt("ItemPickup." + event.getItem().getItemStack().getType().toString() + ".Duration"));
 
-			// Notify the user of any duration mistakes.
-			if (duration < -1 || duration == 0 || duration > 1500) {
-				plugin.getLogger().log(Level.CONFIG, "The duration for " + event.getItem().getItemStack().getType()
-						+ " was incorrect! Fix this in the config!");
+			// Verify the color using a ColorVerification.
+			ColorVerification colorVerification = new ColorVerification(configColor);
+
+			// If the color isn't valid, the post an error message and return false.
+			if (!colorVerification.getIsValid()) {
+				plugin.getLogger().log(Level.CONFIG,
+						"The color for ItemPickup." + event.getItem() + " was incorrect! Fix this in the config!");
 				return;
-			} else if (duration == -1) {
-				// Set duration to a large number so it'll be infinite.
-				duration = 100000;
 			}
 
-			// Try-Catch statement to make sure that the chat color is not null or
-			// incorrect.
-			try {
-				color = ChatColor.valueOf((plugin.getConfig()
-						.getString("ItemPickup." + event.getItem().getItemStack().getType().toString() + ".Color"))
-								.toUpperCase());
-			} catch (NullPointerException e) {
-				plugin.getLogger().log(Level.CONFIG, "The color for " + event.getItem().getItemStack().getType()
-						+ " was null! Fix this in the config!");
-				return;
-			} catch (IllegalArgumentException e) {
-				plugin.getLogger().log(Level.CONFIG, "The color for " + event.getItem().getItemStack().getType()
-						+ " was not an allowed color! Fix this in the config!");
+			// Verify the duration using a DurationVerification.
+			DurationVerification durationVerification = new DurationVerification(configDuration);
+
+			// If the duration isn't valid, then post an error message and return false.
+			if (!durationVerification.getIsValid()) {
+				plugin.getLogger().log(Level.CONFIG,
+						"The duration for ItemPickup." + event.getItem() + " was incorrect! Fix this in the config!");
 				return;
 			}
 
 			// Set the glow for the player.
-			plugin.setGlow((Player) event.getPlayer(), duration, color);
+			plugin.setGlow((Player) event.getPlayer(), durationVerification.getVerifiedDuration(),
+					ChatColor.valueOf(colorVerification.getVerifiedColor()));
 		}
 	}
 
@@ -160,38 +150,36 @@ public final class PlayerListener implements Listener {
 		// Check if the item is contained in the config file...
 		if (plugin.getConfig().contains("EntityKilled." + event.getEntity().getType().toString())) {
 
-			// Set the duration and color. Resorts to default values if it fails.
-			int duration = plugin.getConfig()
-					.getInt("EntityKilled." + event.getEntity().getType().toString() + ".Duration");
-			ChatColor color = null;
+			// Variables for the method.
+			String configColor, configDuration;
+			configColor = plugin.getConfig()
+					.getString("EntityKilled." + event.getEntity().getType().toString() + ".Color");
+			configDuration = Integer.toString(
+					plugin.getConfig().getInt("EntityKilled." + event.getEntity().getType().toString() + ".Duration"));
 
-			// Notify the user of any duration mistakes.
-			if (duration < -1 || duration == 0 || duration > 1500) {
-				plugin.getLogger().log(Level.CONFIG, "The duration for " + event.getEntity().getType().toString()
-						+ " was incorrect! Fix this in the config!");
+			// Verify the color using a ColorVerification.
+			ColorVerification colorVerification = new ColorVerification(configColor);
+
+			// If the color isn't valid, the post an error message and return false.
+			if (!colorVerification.getIsValid()) {
+				plugin.getLogger().log(Level.CONFIG,
+						"The color for EntityKilled." + event.getEntity() + " was incorrect! Fix this in the config!");
 				return;
-			} else if (duration == -1) {
-				// Set duration to a large number so it'll be infinite.
-				duration = 100000;
 			}
 
-			// Try-Catch statement to make sure that the chat color is not null or
-			// incorrect.
-			try {
-				color = ChatColor.valueOf((plugin.getConfig()
-						.getString("EntityKilled." + event.getEntity().getType().toString() + ".Color")).toUpperCase());
-			} catch (NullPointerException e) {
-				plugin.getLogger().log(Level.CONFIG, "The color for " + event.getEntity().getType().toString()
-						+ " was null! Fix this in the config!");
-				return;
-			} catch (IllegalArgumentException e) {
-				plugin.getLogger().log(Level.CONFIG, "The color for " + event.getEntity().getType().toString()
-						+ " was not an allowed color! Fix this in the config!");
+			// Verify the duration using a DurationVerification.
+			DurationVerification durationVerification = new DurationVerification(configDuration);
+
+			// If the duration isn't valid, then post an error message and return false.
+			if (!durationVerification.getIsValid()) {
+				plugin.getLogger().log(Level.CONFIG, "The duration for EntityKilled." + event.getEntity()
+						+ " was incorrect! Fix this in the config!");
 				return;
 			}
 
 			// Set the glow for the player.
-			plugin.setGlow((Player) event.getEntity().getKiller(), duration, color);
+			plugin.setGlow((Player) event.getEntity().getKiller(), durationVerification.getVerifiedDuration(),
+					ChatColor.valueOf(colorVerification.getVerifiedColor()));
 		}
 
 	}
@@ -204,45 +192,35 @@ public final class PlayerListener implements Listener {
 		// Check if the item is contained in the config file...
 		if (plugin.getConfig().contains("Teleport." + event.getCause().toString())) {
 
-			// Set the duration and color. Resorts to default values if it fails.
-			int duration = plugin.getConfig().getInt("Teleport." + event.getCause().toString() + ".Duration");
-			ChatColor color = null;
+			// Variables for the method.
+			String configColor, configDuration;
+			configColor = plugin.getConfig().getString("Teleport." + event.getCause().toString() + ".Color");
+			configDuration = Integer
+					.toString(plugin.getConfig().getInt("Teleport." + event.getCause().toString() + ".Duration"));
 
-			// Notify the user of any duration mistakes.
-			if (duration < -1 || duration == 0 || duration > 1500) {
+			// Verify the color using a ColorVerification.
+			ColorVerification colorVerification = new ColorVerification(configColor);
+
+			// If the color isn't valid, the post an error message and return false.
+			if (!colorVerification.getIsValid()) {
 				plugin.getLogger().log(Level.CONFIG,
-						"The duration for " + event.getCause().toString() + " was incorrect! Fix this in the config!");
+						"The color for Teleport." + event.getCause() + " was incorrect! Fix this in the config!");
 				return;
-			} else if (duration == -1) {
-				// Set duration to a large number so it'll be infinite.
-				duration = 100000;
 			}
 
-			// Try-Catch statement to make sure that the chat color is not null or
-			// incorrect.
-			try {
-				color = ChatColor.valueOf(
-						(plugin.getConfig().getString("Teleport." + event.getCause().toString() + ".Color"))
-								.toUpperCase());
-			} catch (NullPointerException e) {
+			// Verify the duration using a DurationVerification.
+			DurationVerification durationVerification = new DurationVerification(configDuration);
+
+			// If the duration isn't valid, then post an error message and return false.
+			if (!durationVerification.getIsValid()) {
 				plugin.getLogger().log(Level.CONFIG,
-						"The color for " + event.getCause().toString() + " was null! Fix this in the config!");
-				return;
-			} catch (IllegalArgumentException e) {
-				plugin.getLogger().log(Level.CONFIG, "The color for " + event.getCause().toString()
-						+ " was not an allowed color! Fix this in the config!");
+						"The duration for Teleport." + event.getCause() + " was incorrect! Fix this in the config!");
 				return;
 			}
 
 			// Set the glow for the player.
-			plugin.setGlow((Player) event.getPlayer(), duration, color);
+			plugin.setGlow((Player) event.getPlayer(), durationVerification.getVerifiedDuration(),
+					ChatColor.valueOf(colorVerification.getVerifiedColor()));
 		}
-
-	}
-
-	// This just prints a message on login as a test.
-	@EventHandler
-	public void onLogin(PlayerLoginEvent event) {
-		plugin.getLogger().log(Level.INFO, "This is an event test. Please ignore.");
 	}
 }

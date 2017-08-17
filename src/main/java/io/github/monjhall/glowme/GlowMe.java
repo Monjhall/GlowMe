@@ -1,6 +1,9 @@
 package io.github.monjhall.glowme;
 
+import java.util.logging.Level;
+
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
@@ -40,27 +43,32 @@ public class GlowMe extends JavaPlugin {
 
 	protected void setGlow(Player player, int duration, ChatColor color) {
 
-		// Create the glow effect type.
-		PotionEffectType glowEffectType = PotionEffectType.getById(24);
-
-		// Create the glow effect.
-		PotionEffect glowEffect = new PotionEffect(glowEffectType, (duration * 20), 1);
-
-		// If the player has a glow effect already, remove it.
-		if (player.hasPotionEffect(PotionEffectType.getById(24))) {
-			player.removePotionEffect(PotionEffectType.getById(24));
-			removePlayerFromTeam(player);
+		// If duration is 0, clear the glow instead.
+		if (duration == 0) {
+			clearGlow(player);
 		}
 
-		// Add the player to the specified team.
-		addPlayerToTeam(player, color);
+		// Otherwise, set the new glow for the player.
+		else {
 
-		// Apply the glow to the provided player.
-		glowEffect.apply(player);
+			// Create the glow effect.
+			PotionEffectType glowEffectType = PotionEffectType.getById(24);
+			PotionEffect glowEffect = new PotionEffect(glowEffectType, (duration * 20), 1);
+
+			// If the player has a glow effect already, clear it.
+			if (player.hasPotionEffect(PotionEffectType.getById(24))) {
+				clearGlow(player);
+			}
+
+			// Apply the glow to the provided player.
+			addPlayerToTeam(player, color);
+			glowEffect.apply(player);
+		}
 	}
 
 	protected void clearGlow(Player player) {
 
+		// If the player has a glow effect, remove it and remove them from their team.
 		if (player.hasPotionEffect(PotionEffectType.getById(24))) {
 			player.removePotionEffect(PotionEffectType.getById(24));
 			removePlayerFromTeam(player);

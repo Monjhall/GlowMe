@@ -2,20 +2,21 @@ package io.github.monjhall.glowme;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.potion.PotionEffectType;
 
 public class GlowMeCommandExecutor implements CommandExecutor {
+
+	// Class variables.
 	private final GlowMe plugin;
 
 	// Constructor.
@@ -35,7 +36,18 @@ public class GlowMeCommandExecutor implements CommandExecutor {
 				return false;
 			}
 
-			// If there are only 2 arguments, set the glow on the sender.
+			// If there are more than three arguments, return false.
+			if (args.length > 3) {
+				sender.sendMessage("Too many arguments, proper usage below.");
+				return false;
+			}
+
+			// Variables for the method.
+			Player target = null;
+			String argumentColor, argumentDuration;
+			argumentColor = argumentDuration = "";
+
+			// If there are only 2 arguments, verify the sender and set a target.
 			if (args.length == 2) {
 
 				// If the sender is the console, return false.
@@ -44,120 +56,67 @@ public class GlowMeCommandExecutor implements CommandExecutor {
 					return false;
 				}
 
-				// Verify that a proper color was provided.
-				ChatColor teamColor;
-				try {
-					teamColor = ChatColor.valueOf(args[0].toUpperCase());
-				} catch (IllegalArgumentException e) {
-					sender.sendMessage("Color must be one of the allowed scoreboard colors.");
-					return false;
+				// Otherwise, set the parameters.
+				else {
+					target = (Player) sender;
+					argumentColor = args[0];
+					argumentDuration = args[1];
 				}
-
-				if (teamColor.isFormat()) {
-					sender.sendMessage("Color must be a color, not a format code.");
-					return false;
-				}
-				
-				// Verify duration is an integer, otherwise catch the exception.
-				int duration;
-				try {
-					duration = Integer.parseInt(args[1]);
-				} catch (NumberFormatException e) {
-					sender.sendMessage("Duration must be a number, proper usage below.");
-					return false;
-				}
-
-				// Notify the user of any duration mistakes.
-				if (duration < -1) {
-					sender.sendMessage("Duration must be a value between 1 and 1500 or a value of -1.");
-					return false;
-				} else if (duration == 0) {
-					sender.sendMessage("Duration must be a value between 1 and 1500 or a value of -1."
-							+ "\nIf you are trying to clear a glow, use the /clearglow command.");
-					return false;
-				} else if (duration > 1500) {
-					sender.sendMessage("Duration must be a value between 1 and 1500 or a value of -1."
-							+ "\nIf you are trying to apply infinite glow, use a duration of -1.");
-					return false;
-				} else if (duration == -1) {
-					// Set duration to a large number so it'll be infinite.
-					duration = 100000;
-				} else {
-					// Do nothing...
-				}
-
-				plugin.setGlow((Player) sender, duration, teamColor);
 			}
 
-			// If there are three arguments, set the glow on the specified player.
+			// If there are 3 arguments, verify the target and set it.
 			if (args.length == 3) {
 
-				// Record the target player.
-				Player target = (Bukkit.getServer().getPlayer(args[0]));
-
 				// If the target is not online, return false!
-				if (target == null) {
+				if (Bukkit.getServer().getPlayer(args[0]) == null) {
 					sender.sendMessage(args[0] + " is not online!");
 					return false;
 				}
 
-				// Verify that a proper color was provided.
-				ChatColor teamColor;
-				try {
-					teamColor = ChatColor.valueOf(args[1].toUpperCase());
-				} catch (IllegalArgumentException e) {
-					sender.sendMessage("Color must be one of the allowed scoreboard colors.");
-					return false;
+				// Otherwise, set the parameters.
+				else {
+					target = Bukkit.getServer().getPlayer(args[0]);
+					argumentColor = args[1];
+					argumentDuration = args[2];
 				}
-
-				if (teamColor.isFormat()) {
-					sender.sendMessage("Color must be a color, not a format code.");
-					return false;
-				}
-				
-				// Verify duration is an integer, otherwise catch the exception.
-				int duration;
-				try {
-					duration = Integer.parseInt(args[2]);
-				} catch (NumberFormatException e) {
-					sender.sendMessage("Duration must be a number, proper usage below.");
-					return false;
-				}
-				
-				// Notify the user of any duration mistakes.
-				if (duration < -1) {
-					sender.sendMessage("Duration must be a value between 1 and 1500 or a value of -1.");
-					return false;
-				} else if (duration == 0) {
-					sender.sendMessage("Duration must be a value between 1 and 1500 or a value of -1."
-							+ "\nIf you are trying to clear a glow, use the /clearglow command.");
-					return false;
-				} else if (duration > 1500) {
-					sender.sendMessage("Duration must be a value between 1 and 1500 or a value of -1."
-							+ "\nIf you are trying to apply infinite glow, use a duration of -1.");
-					return false;
-				} else if (duration == -1) {
-					// Set duration to a large number so it'll be infinite.
-					duration = 100000;
-				} else {
-					// Do nothing...
-				}
-
-				plugin.setGlow(target, duration, teamColor);
-
 			}
 
-			// If there are more than three arguments, return false.
-			if (args.length > 3) {
-				sender.sendMessage("Too many arguments, proper usage below.");
+			// Verify the color using a ColorVerification.
+			ColorVerification colorVerification = new ColorVerification(argumentColor);
+
+			// If the color isn't valid, the post an error message and return false.
+			if (!colorVerification.getIsValid()) {
+				sender.sendMessage(colorVerification.getErrorMessage());
 				return false;
 			}
 
+			// Verify the duration using a DurationVerification.
+			DurationVerification durationVerification = new DurationVerification(argumentDuration);
+
+			// If the duration isn't valid, then post an error message and return false.
+			if (!durationVerification.getIsValid()) {
+				sender.sendMessage(durationVerification.getErrorMessage());
+				return false;
+			}
+
+			plugin.setGlow(target, durationVerification.getVerifiedDuration(),
+					ChatColor.valueOf(colorVerification.getVerifiedColor()));
 			return true;
 		}
 
 		// If using the command clearglow...
 		if (cmd.getName().equalsIgnoreCase("clearglow")) {
+
+			// If there is more than 1 argument, return false.
+			if (args.length > 1) {
+				sender.sendMessage("Too many arguments, proper usage below.");
+				return false;
+			}
+
+			// Variables for the method.
+			Player target = null;
+
+			// If there are no arguments, verify and set the target.
 			if (args.length == 0) {
 
 				// If the sender is the console, return false.
@@ -166,157 +125,154 @@ public class GlowMeCommandExecutor implements CommandExecutor {
 					return false;
 				}
 
-				// If the player has no glow, warn the user.
-				if (!(((Player) sender).hasPotionEffect(PotionEffectType.getById(24)))) {
-					sender.sendMessage("You have no active glow!");
-					return false;
+				// Otherwise, set the target.
+				else {
+					target = (Player) sender;
 				}
-
-				// Otherwise, clear their glow.
-				plugin.clearGlow((Player) sender);
 			}
 
+			// If there is 1 argument, verify and set the target.
 			if (args.length == 1) {
 
-				// Record the target player.
-				Player target = (Bukkit.getServer().getPlayer(args[0]));
-
 				// If the target is not online, return false!
-				if (target == null) {
+				if (Bukkit.getServer().getPlayer(args[0]) == null) {
 					sender.sendMessage(args[0] + " is not online!");
 					return false;
 				}
 
-				// If the player has no glow, warn the user.
-				if (!(((Player) sender).hasPotionEffect(PotionEffectType.getById(24)))) {
-					sender.sendMessage(args[0] + " has no active glow!");
-					return false;
+				// Otherwise, set the target.
+				else {
+					target = Bukkit.getServer().getPlayer(args[0]);
 				}
-
-				// Otherwise, clear that player's glow.
-				plugin.clearGlow(target);
 
 			}
 
-			// If there is more than one arguments, return false.
-			if (args.length > 1) {
-				sender.sendMessage("Too many arguments, proper usage below.");
+			// If the player has no glow, warn the user.
+			if (!target.hasPotionEffect(PotionEffectType.getById(24))) {
+
+				// If the sender is also the target, use "you."
+				if (target == sender) {
+					sender.sendMessage("You have no active glow!");
+				}
+
+				// Otherwise, say "player."
+				else {
+					sender.sendMessage(args[0] + " has no active glow!");
+				}
+
 				return false;
 			}
 
+			plugin.clearGlow(target);
 			return true;
 		}
-		
+
 		// If using the command setglowconfig...
 		if (cmd.getName().equalsIgnoreCase("setglowconfig")) {
-			
-			// Constant array of event types.
-			Collection<String> eventTypes = Arrays.asList("ITEMCRAFT", "ITEMCONSUME", "ITEMPICKUP", "TELEPORTCAUSE", "ENTITYKILLED");
-			
-			// Variables for the final config setting.
-			String eventType = "";
-			String eventCause = "";
-			String color = null;
-			int duration = 0;
-			
+
 			// If there are less than four arguments, return false.
 			if (args.length < 4) {
 				sender.sendMessage("Too few arguments, proper usage below.");
 				return false;
 			}
-			
+
 			// If there are more than four arguments, return false.
 			if (args.length > 4) {
 				sender.sendMessage("Too many arguments, proper usage below.");
 				return false;
 			}
-			
+
+			// Constant array of event types.
+			Collection<String> eventTypes = Arrays.asList("ITEMCRAFT", "ITEMCONSUME", "ITEMPICKUP", "TELEPORTCAUSE",
+					"ENTITYKILLED");
+
+			// Variables for the method.
+			String argumentEventType, argumentEventCause, argumentColor, argumentDuration, verifiedEventType,
+					verifiedEventCause;
+			argumentEventType = args[0];
+			argumentEventCause = args[1];
+			argumentColor = args[2];
+			argumentDuration = args[3];
+			verifiedEventType = verifiedEventCause = "";
+
 			// If the event type is invalid, return false.
-			if (!eventTypes.contains(args[0].toUpperCase())) {
+			if (!eventTypes.contains(argumentEventType.toUpperCase())) {
 				sender.sendMessage("The event must be a valid event type from the config!");
 				return false;
 			}
-			
+
 			// Set the event type, then continue.
-			if (args[0].toUpperCase().equals("ITEMCRAFT")) eventType = "ItemCraft";
-			if (args[0].toUpperCase().equals("ITEMCONSUME")) eventType = "ItemConsume";
-			if (args[0].toUpperCase().equals("ITEMPICKUP")) eventType = "ItemPickup";
-			if (args[0].toUpperCase().equals("TELEPORT")) eventType = "Teleport";
-			if (args[0].toUpperCase().equals("ENTITYKILLED")) eventType = "EntityKilled";
-			
+			if (argumentEventType.toUpperCase().equals("ITEMCRAFT"))
+				verifiedEventType = "ItemCraft";
+			if (argumentEventType.toUpperCase().equals("ITEMCONSUME"))
+				verifiedEventType = "ItemConsume";
+			if (argumentEventType.toUpperCase().equals("ITEMPICKUP"))
+				verifiedEventType = "ItemPickup";
+			if (argumentEventType.toUpperCase().equals("TELEPORT"))
+				verifiedEventType = "Teleport";
+			if (argumentEventType.toUpperCase().equals("ENTITYKILLED"))
+				verifiedEventType = "EntityKilled";
+
 			// Verify the second argument (Material, Teleport Cause, or Entity).
-			if (eventType == "ItemCraft" || eventType == "ItemConsume" || eventType == "ItemPickup") {
-				
+			if (verifiedEventType == "ItemCraft" || verifiedEventType == "ItemConsume"
+					|| verifiedEventType == "ItemPickup") {
+
 				// If the argument is not a material, return false.
 				try {
-					eventCause = Material.matchMaterial(args[1]).toString();
+					verifiedEventCause = Material.matchMaterial(argumentEventCause).toString();
 				} catch (NullPointerException e) {
-					sender.sendMessage("The material you're trying to add doesn't exist! Check the list of valid materials.");
+					sender.sendMessage(
+							"The material you're trying to add doesn't exist! Check the list of valid materials.");
 					return false;
 				}
-			} else if (eventType == "Teleport") {
-				
+			} else if (verifiedEventType == "Teleport") {
+
 				// If the argument is not a teleport cause, return false.
 				try {
-					eventCause = TeleportCause.valueOf(args[1]).toString();
+					verifiedEventCause = TeleportCause.valueOf(args[1]).toString();
 				} catch (IllegalArgumentException e) {
-					sender.sendMessage("The teleport cause you're trying to add doesn't exist! Check the list of valid teleport causes.");
+					sender.sendMessage(
+							"The teleport cause you're trying to add doesn't exist! Check the list of valid teleport causes.");
 					return false;
-				}		
+				}
 			} else {
-				
+
 				// If the argument is not an entity type, return false.
 				try {
-					eventCause = EntityType.valueOf(args[1]).toString();
+					verifiedEventCause = EntityType.valueOf(args[1]).toString();
 				} catch (IllegalArgumentException e) {
-					sender.sendMessage("The entity you're trying to add doesn't exist! Check the list of valid entities.");
+					sender.sendMessage(
+							"The entity you're trying to add doesn't exist! Check the list of valid entities.");
 					return false;
 				}
 			}
-			
-			// Verify that a proper color was provided.
-			try {
-				ChatColor.valueOf(args[2].toUpperCase());
-			} catch (IllegalArgumentException e) {
-				sender.sendMessage("Color must be one of the allowed scoreboard colors.");
+
+			// Verify the color using a ColorVerification.
+			ColorVerification colorVerification = new ColorVerification(argumentColor);
+
+			// If the color isn't valid, the post an error message and return false.
+			if (!colorVerification.getIsValid()) {
+				sender.sendMessage(colorVerification.getErrorMessage());
 				return false;
 			}
 
-			if (ChatColor.valueOf(args[2].toUpperCase()).isFormat()) {
-				sender.sendMessage("Color must be a color, not a format code.");
+			// Verify the duration using a DurationVerification.
+			DurationVerification durationVerification = new DurationVerification(argumentDuration);
+
+			// If the duration isn't valid, then post an error message and return false.
+			if (!durationVerification.getIsValid()) {
+				sender.sendMessage(durationVerification.getErrorMessage());
 				return false;
 			}
-			
-			// Reset the color to the string, since it works!
-			color = args[2].toUpperCase();
-			
-			// Verify duration is an integer, otherwise catch the exception.
-			try {
-				duration = Integer.parseInt(args[3]);
-			} catch (NumberFormatException e) {
-				sender.sendMessage("Duration must be a number, proper usage below.");
-				return false;
-			}
-			
-			// Notify the user of any duration mistakes.
-			if (duration < -1) {
-				sender.sendMessage("Duration must be a value between 0 and 1500 or a value of -1.");
-				return false;
-			} else if (duration > 1500) {
-				sender.sendMessage("Duration must be a value between 0 and 1500 or a value of -1."
-						+ "\nIf you are trying to apply infinite glow, use a duration of -1.");
-				return false;
-			} else if (duration == -1) {
-				// Set duration to a large number so it'll be infinite.
-				duration = 100000;
-			}
-			
+
 			// Set the new config!
 			sender.sendMessage("New configuration has been set!");
-			plugin.getConfig().set(eventType + "." + eventCause + "." + "Color", color.toString());
-			plugin.getConfig().set(eventType + "." + eventCause + "." + "Duration", duration);
+			plugin.getConfig().set(verifiedEventType + "." + verifiedEventCause + "." + "Color",
+					colorVerification.getVerifiedColor());
+			plugin.getConfig().set(verifiedEventType + "." + verifiedEventCause + "." + "Duration",
+					durationVerification.getVerifiedDuration());
 			plugin.saveConfig();
-			
+
 			return true;
 		}
 
