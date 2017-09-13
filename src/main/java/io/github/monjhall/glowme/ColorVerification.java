@@ -2,12 +2,10 @@ package io.github.monjhall.glowme;
 
 import org.bukkit.ChatColor;
 
-public class ColorVerification {
+public class ColorVerification extends DataVerification {
 
 	// Class variables.
 	private String verifiedColor;
-	private boolean isValid;
-	private String errorMessage;
 
 	// Constructor verifies the duration quality.
 	public ColorVerification(String colorString) {
@@ -40,15 +38,4 @@ public class ColorVerification {
 	public String getVerifiedColor() {
 		return this.verifiedColor;
 	}
-
-	// Getter for isValid.
-	public boolean getIsValid() {
-		return this.isValid;
-	}
-
-	// Getter for errorMessage.
-	public String getErrorMessage() {
-		return this.errorMessage;
-	}
-
 }

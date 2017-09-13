@@ -1,7 +1,5 @@
 package io.github.monjhall.glowme;
 
-import java.util.logging.Level;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -9,6 +7,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.*;
+
+enum EventType {
+	ITEMCRAFT, ITEMCONSUME, ITEMPICKUP, TELEPORT, ENTITYKILLED
+}
+
+enum Setting {
+	COLOR, DURATION, MESSAGE, ACTION
+}
+
+enum ActionType {
+	CLEANSE, GLOW, ANNOUNCEGLOW, ANNOUNCECLEANSE, ANNOUNCE
+}
 
 public class GlowMe extends JavaPlugin {
 
@@ -25,6 +35,8 @@ public class GlowMe extends JavaPlugin {
 		this.getCommand("glow").setExecutor(commandExecutor);
 		this.getCommand("clearglow").setExecutor(commandExecutor);
 		this.getCommand("setglowconfig").setExecutor(commandExecutor);
+		this.getCommand("removeglowconfig").setExecutor(commandExecutor);
+		this.getCommand("configGlow").setExecutor(commandExecutor);
 
 		// Create the active effects task and repeatedly run it.
 		checkActiveEffects checkActiveEffectsTask = new checkActiveEffects(this);
@@ -97,6 +109,23 @@ public class GlowMe extends JavaPlugin {
 		}
 		playerTeam.addPlayer(player);
 		playerTeam.setPrefix(color + "");
+	}
+	
+	protected boolean removeConfig(String path, CommandSender sender) {
+		
+		// If the configuration path exists, remove the configuration.
+		if (getConfig().contains(path)) {
+			getConfig().set(path, null);
+			saveConfig();
+			sender.sendMessage("Configuration was removed.");
+			return true;
+		}
+		
+		// Otherwise, return false.
+		else {
+			sender.sendMessage("Configuration doesn't exist, cannot be removed.");
+			return false;
+		}
 	}
 
 	public void loadConfiguration() {

@@ -1,11 +1,9 @@
 package io.github.monjhall.glowme;
 
-public class DurationVerification {
+public class DurationVerification extends DataVerification {
 
 	// Class variables.
 	private int verifiedDuration;
-	private boolean isValid;
-	private String errorMessage;
 
 	// Constructor verifies the duration quality.
 	public DurationVerification(String durationString) {
@@ -44,15 +42,5 @@ public class DurationVerification {
 	// Getter for verifiedDuration.
 	public int getVerifiedDuration() {
 		return this.verifiedDuration;
-	}
-	
-	// Getter for isValid.
-	public boolean getIsValid() {
-		return this.isValid;
-	}
-	
-	// Getter for errorMessage.
-	public String getErrorMessage() {
-		return this.errorMessage;
 	}
 }

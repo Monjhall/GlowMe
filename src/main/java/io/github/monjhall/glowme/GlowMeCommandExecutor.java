@@ -2,6 +2,7 @@ package io.github.monjhall.glowme;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -167,8 +168,35 @@ public class GlowMeCommandExecutor implements CommandExecutor {
 			return true;
 		}
 
-		// If using the command setglowconfig...
-		if (cmd.getName().equalsIgnoreCase("setglowconfig")) {
+		// If using the command removeglowconfig...
+		if (cmd.getName().equalsIgnoreCase("removeglowconfig")) {
+
+			// If there are less than two arguments, return false.
+			if (args.length < 2) {
+				sender.sendMessage("Too few arguments, proper usage below.");
+				return false;
+			}
+
+			// If there are more than two arguments, return false.
+			if (args.length > 2) {
+				sender.sendMessage("Too many arguments, proper usage below.");
+				return false;
+			}
+
+			// Variables for the method.
+			String argumentEventType, argumentEventCause;
+			argumentEventType = args[0];
+			argumentEventCause = args[1];
+
+			// If the configuration path exists, remove the configuration.
+			if (plugin.removeConfig(argumentEventType + "." + argumentEventCause, sender) == false)
+				return false;
+
+			return true;
+		}
+
+		// If using the command configGlow...
+		if (cmd.getName().equalsIgnoreCase("configGlow")) {
 
 			// If there are less than four arguments, return false.
 			if (args.length < 4) {
@@ -176,103 +204,93 @@ public class GlowMeCommandExecutor implements CommandExecutor {
 				return false;
 			}
 
-			// If there are more than four arguments, return false.
-			if (args.length > 4) {
-				sender.sendMessage("Too many arguments, proper usage below.");
+			// Assign the arguments to variable to verify.
+			String argumentEventType, argumentEventCause, argumentSetting, argumentSettingValue;
+			argumentEventType = args[0].toUpperCase();
+			argumentEventCause = args[1].toUpperCase();
+			argumentSetting = args[2].toUpperCase();
+			argumentSettingValue = args[3].toUpperCase();
+			EventType verifiedEventType;
+			Setting verifiedSetting;
+
+			// Verify the event type is correct, otherwise return false.
+			try {
+				verifiedEventType = EventType.valueOf(argumentEventType);
+			} catch (IllegalArgumentException e) {
+				sender.sendMessage("EventType provided doesn't exist.");
 				return false;
 			}
 
-			// Constant array of event types.
-			Collection<String> eventTypes = Arrays.asList("ITEMCRAFT", "ITEMCONSUME", "ITEMPICKUP", "TELEPORTCAUSE",
-					"ENTITYKILLED");
-
-			// Variables for the method.
-			String argumentEventType, argumentEventCause, argumentColor, argumentDuration, verifiedEventType,
-					verifiedEventCause;
-			argumentEventType = args[0];
-			argumentEventCause = args[1];
-			argumentColor = args[2];
-			argumentDuration = args[3];
-			verifiedEventType = verifiedEventCause = "";
-
-			// If the event type is invalid, return false.
-			if (!eventTypes.contains(argumentEventType.toUpperCase())) {
-				sender.sendMessage("The event must be a valid event type from the config!");
-				return false;
-			}
-
-			// Set the event type, then continue.
-			if (argumentEventType.toUpperCase().equals("ITEMCRAFT"))
-				verifiedEventType = "ItemCraft";
-			if (argumentEventType.toUpperCase().equals("ITEMCONSUME"))
-				verifiedEventType = "ItemConsume";
-			if (argumentEventType.toUpperCase().equals("ITEMPICKUP"))
-				verifiedEventType = "ItemPickup";
-			if (argumentEventType.toUpperCase().equals("TELEPORT"))
-				verifiedEventType = "Teleport";
-			if (argumentEventType.toUpperCase().equals("ENTITYKILLED"))
-				verifiedEventType = "EntityKilled";
-
-			// Verify the second argument (Material, Teleport Cause, or Entity).
-			if (verifiedEventType == "ItemCraft" || verifiedEventType == "ItemConsume"
-					|| verifiedEventType == "ItemPickup") {
-
-				// If the argument is not a material, return false.
-				try {
-					verifiedEventCause = Material.matchMaterial(argumentEventCause).toString();
-				} catch (NullPointerException e) {
-					sender.sendMessage(
-							"The material you're trying to add doesn't exist! Check the list of valid materials.");
-					return false;
-				}
-			} else if (verifiedEventType == "Teleport") {
-
-				// If the argument is not a teleport cause, return false.
-				try {
-					verifiedEventCause = TeleportCause.valueOf(args[1]).toString();
-				} catch (IllegalArgumentException e) {
-					sender.sendMessage(
-							"The teleport cause you're trying to add doesn't exist! Check the list of valid teleport causes.");
-					return false;
-				}
-			} else {
-
-				// If the argument is not an entity type, return false.
-				try {
-					verifiedEventCause = EntityType.valueOf(args[1]).toString();
-				} catch (IllegalArgumentException e) {
-					sender.sendMessage(
-							"The entity you're trying to add doesn't exist! Check the list of valid entities.");
-					return false;
-				}
-			}
-
-			// Verify the color using a ColorVerification.
-			ColorVerification colorVerification = new ColorVerification(argumentColor);
-
-			// If the color isn't valid, the post an error message and return false.
-			if (!colorVerification.getIsValid()) {
-				sender.sendMessage(colorVerification.getErrorMessage());
-				return false;
-			}
-
-			// Verify the duration using a DurationVerification.
-			DurationVerification durationVerification = new DurationVerification(argumentDuration);
+			// Verify the eventCause using an EventCauseVerification.
+			EventCauseVerification eventCauseVerification = new EventCauseVerification(verifiedEventType,
+					argumentEventCause);
 
 			// If the duration isn't valid, then post an error message and return false.
-			if (!durationVerification.getIsValid()) {
-				sender.sendMessage(durationVerification.getErrorMessage());
+			if (!eventCauseVerification.getIsValid()) {
+				sender.sendMessage(eventCauseVerification.getErrorMessage());
 				return false;
 			}
 
-			// Set the new config!
-			sender.sendMessage("New configuration has been set!");
-			plugin.getConfig().set(verifiedEventType + "." + verifiedEventCause + "." + "Color",
-					colorVerification.getVerifiedColor());
-			plugin.getConfig().set(verifiedEventType + "." + verifiedEventCause + "." + "Duration",
-					durationVerification.getVerifiedDuration());
-			plugin.saveConfig();
+			// Verify the Setting is correct.
+			try {
+				verifiedSetting = Setting.valueOf(argumentSetting);
+			} catch (IllegalArgumentException e) {
+				sender.sendMessage("Setting provided doesn't exist.");
+				return false;
+			}
 
+			// If there are more than four arguments and GlowSetting isn't message.
+			if (args.length > 4 && !(verifiedSetting == Setting.MESSAGE)) {
+				sender.sendMessage("Too many arguments, proper usage below.");
+			}
+
+			// Verify the Setting value.
+			SettingValueVerification settingValueVerification = new SettingValueVerification(
+					verifiedSetting, argumentSettingValue);
+
+			if (!settingValueVerification.getIsValid()) {
+				sender.sendMessage(settingValueVerification.getErrorMessage());
+				return false;
+			}
+
+			// All values are verified, so set them in the config!
+			String path = "";
+			if (verifiedSetting == Setting.DURATION || verifiedSetting == Setting.COLOR) {
+				path = verifiedEventType + "." + eventCauseVerification.getVerifiedEventCause() + ".GLOWSETTINGS."
+						+ verifiedSetting;
+			} else {
+				path = verifiedEventType + "." + eventCauseVerification.getVerifiedEventCause() + "."
+						+ verifiedSetting;
+			}
+
+
+			// If the SettingValue is an integer, set it as one.
+			if (verifiedSetting == Setting.DURATION) {
+				plugin.getConfig().set(path,
+						Integer.parseInt(settingValueVerification.getverifiedSettingValue()));
+				sender.sendMessage(
+						path + " is now set to " + settingValueVerification.getverifiedSettingValue() + "!");
+			}
+
+			// If the GlowSettingValue is a color or action, set it as a string.
+			else if (verifiedSetting == Setting.COLOR || verifiedSetting == Setting.ACTION) {
+				plugin.getConfig().set(path, settingValueVerification.getverifiedSettingValue());
+				sender.sendMessage(
+						path + " is now set to " + settingValueVerification.getverifiedSettingValue() + "!");
+			}
+
+			// Otherwise, it's a message, set it as one.
+			else {
+				String value = "";
+				for (int i = 3; i < args.length; i++) {
+					value = value + args[i] + " ";
+				}
+				plugin.getConfig().set(path, value.trim());
+				sender.sendMessage(path + " is now set to " + value.trim());
+			}
+
+			// Save the config file.
+			plugin.saveConfig();
 			return true;
 		}
 
@@ -280,5 +298,4 @@ public class GlowMeCommandExecutor implements CommandExecutor {
 		plugin.getLogger().info("No command found.");
 		return false;
 	}
-
 }

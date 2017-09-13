@@ -11,7 +11,7 @@
 # |                               Use material names from this list:                                |
 # |                         https://jd.bukkit.org/org/bukkit/Material.html                          |
 # |                                 Use color names from this list:                                 |
-# |                         https://jd.bukkit.org/org/bukkit/ChatColor.html                         |
+# |                         https://jd.bukkit.org/org/bukkit/ChatCOLOR.html                         |
 # |                               Use teleport causes from this list:                               |
 # |      https://jd.bukkit.org/org/bukkit/event/player/PlayerTeleportEvent.TeleportCause.html       |
 # |                                Use entity types from this list:                                 |
@@ -20,40 +20,52 @@
 # |                                                                                                 |
 # |-------------------------------------------------------------------------------------------------|
 #
-ItemCraft:
+ITEMCRAFT:
   DIAMOND_SWORD:
-    Color: AQUA
-    Duration: 30
+    ACTION: ANNOUNCEGLOW
+    MESSAGE: "<p> has crafted a diamond sword!"
+    GLOWSETTINGS:
+      COLOR: AQUA
+      DURATION: 30
   DIAMOND_HOE:
-    Color: BLUE
-    Duration: 15
-
-
-ItemConsume:
+    ACTION: GLOW
+    MESSAGE: "<p> has crafted a diamond hoe!"
+    GLOWSETTINGS:
+      COLOR: GREEN
+      DURATION: 45
+ITEMCONSUME:
   GOLDEN_APPLE:
-    Color: YELLOW
-    Duration: 30
+    ACTION: ANNOUNCEGLOW
+    MESSAGE: "<p> has eaten a golden apple!"
+    GLOWSETTINGS:
+      COLOR: YELLOW
+      DURATION: 45
   BREAD:
-    Color: GOLD
-    Duration: 30
-    
-
-ItemPickup:
+    ACTION: ANNOUNCECLEANSE
+    MESSAGE: "<p> has cleansed their glow with bread!"
+ITEMPICKUP:
   DIAMOND:
-    Color: AQUA
-    Duration: 30
-    
-
-Teleport:
+    ACTION: GLOW
+    GLOWSETTINGS:
+      COLOR: BLUE
+      DURATION: 30
+TELEPORT:
   ENDER_PEARL:
-    Color: DARK_PURPLE
-    Duration: 30
-    
-
-EntityKilled:
+    ACTION: GLOW
+    GLOWSETTINGS:
+      COLOR: DARK_PURPLE
+      DURATION: 30
+ENTITYKILLED:
   PLAYER:
-    Color: RED
-    Duration: 30
+    ACTION: GLOW
+    GLOWSETTINGS:
+      COLOR: RED
+      DURATION: 60
   SKELETON:
-    Color: BLACK
-    Duration: 30
+    ACTION: ANNOUNCEGLOW
+    MESSAGE: "<p> has slain a skeleton!"
+    GLOWSETTINGS:
+      COLOR: BLACK
+      DURATION: 30
+  CREEPER:
+    ACTION: CLEANSE

@@ -1,6 +1,6 @@
 name: GlowMe
 main: io.github.monjhall.glowme.GlowMe
-version: 0.7.0
+version: 0.9.0
 author: Monjhall
 
 commands:
@@ -14,25 +14,39 @@ commands:
     usage: /<command> [player]
     permission: glowme.clearglow
     permission-message: You don't have <permission>.
-  setglowconfig:
-    description: Sets a glow configuration in the file.
-    usage: /<command> [Event] [Material/TeleportCause/Entity] [Color] [Duration]
-    permission: glowme.config
+  removeglowconfig:
+    description: Removes a configuration item.
+    usage: /<command> [Event] [Material/TeleportCause/Entity]
+    permision: glowme.removeconfig
     permission-message: You don't have <permission>.
-
+  configGlow:
+    description: Modify a configuration.
+    usage: /<command> [Event] [Material/TeleportCause/Entity] [Setting] [Value]
+    permision: glowme.configglow
+    permission-message: You don't have <permission>.
+    
 permissions:
   glowme.*:
     description: Gives access to all glowme commands.
     children:
       glowme.glow: true
       glowme.clearglow: true
-      glowme.config: true
+      glowme.configglow: true
+      glowme.removeconfig: true
+  glowme.config:
+    description: Gives access to the commands for modifying the config file.
+    children:
+      glowme.configglow: true
+      glowme.removeconfig: true
   glowme.glow:
     description: Gives access to the command for glow setting.
     default: op
   glowme.clearglow:
     description: Gives access to the command for clearing your glow.
     default: op
-  glowme.config:
-    description: Gives access to the command for modifying the config file.
+  glowme.configglow:
+    description: Gives access to the command for setting configurations.
+    default: op
+  glowme.removeconfig:
+    description: Gives access to the command for removing configurations.
     default: op
