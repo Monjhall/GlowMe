@@ -38,7 +38,7 @@ public final class PlayerListener implements Listener {
 
 				// Determine whether the action is valid.
 				try {
-					configAction = ActionType.valueOf(easyPath + ".ACTION").toString();
+					configAction = ActionType.valueOf(plugin.getConfig().getString(easyPath + ".ACTION")).toString();
 				} catch (IllegalArgumentException | NullPointerException exception) {
 					if (exception instanceof IllegalArgumentException) {
 						plugin.getLogger().log(Level.WARNING, "The action listed in the config file for " + easyPath
@@ -54,14 +54,6 @@ public final class PlayerListener implements Listener {
 				// Based on the action listed, react appropriately.
 				if (ActionType.valueOf(configAction).equals(ActionType.GLOW)
 						|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCEGLOW)) {
-
-					// Verify that the glow settings exist.
-					if (plugin.getConfig().contains(easyPath + ".GLOWSETTINGS")) {
-						plugin.getLogger().log(Level.WARNING,
-								"There are no glow settings listed in the config file for " + easyPath
-										+ ". Fix in the config.");
-						return;
-					}
 
 					// Check if color is listed in the glow settings.
 					if (!plugin.getConfig().contains(easyPath + ".GLOWSETTINGS.COLOR")) {
@@ -130,13 +122,12 @@ public final class PlayerListener implements Listener {
 				}
 
 				// Verify the message.
-				configMessage = plugin.getConfig()
-						.getString(easyPath + ".MESSAGE");
+				configMessage = plugin.getConfig().getString(easyPath + ".MESSAGE");
 
 				// Replace components of the message.
 				if (configMessage.contains("<player>") || configMessage.contains("<p>")) {
-					configMessage = configMessage.replaceAll("<player>", event.getWhoClicked().toString());
-					configMessage = configMessage.replaceAll("<p>", event.getWhoClicked().toString());
+					configMessage = configMessage.replaceAll("<player>", event.getWhoClicked().getName());
+					configMessage = configMessage.replaceAll("<p>", event.getWhoClicked().getName());
 				}
 
 				if (configMessage.contains("<cause>") || configMessage.contains("<c>")) {
@@ -163,7 +154,7 @@ public final class PlayerListener implements Listener {
 
 			// Determine whether the action is valid.
 			try {
-				configAction = ActionType.valueOf(easyPath + ".ACTION").toString();
+				configAction = ActionType.valueOf(plugin.getConfig().getString(easyPath + ".ACTION")).toString();
 			} catch (IllegalArgumentException | NullPointerException exception) {
 				if (exception instanceof IllegalArgumentException) {
 					plugin.getLogger().log(Level.WARNING, "The action listed in the config file for " + easyPath
@@ -181,11 +172,12 @@ public final class PlayerListener implements Listener {
 					|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCEGLOW)) {
 
 				// Verify that the glow settings exist.
-				if (plugin.getConfig().contains(easyPath + ".GLOWSETTINGS")) {
-					plugin.getLogger().log(Level.WARNING, "There are no glow settings listed in the config file for "
-							+ easyPath + ". Fix in the config.");
-					return;
-				}
+				// if (plugin.getConfig().contains(easyPath + ".GLOWSETTINGS")) {
+				// plugin.getLogger().log(Level.WARNING,
+				// "There are no glow settings listed in the config file for " + easyPath
+				// + ". Fix in the config.");
+				// return;
+				// }
 
 				// Check if color is listed in the glow settings.
 				if (!plugin.getConfig().contains(easyPath + ".GLOWSETTINGS.COLOR")) {
@@ -231,65 +223,63 @@ public final class PlayerListener implements Listener {
 
 			}
 
-		}
+			// Based on the action listed, react appropriately.
+			if (ActionType.valueOf(configAction).equals(ActionType.CLEANSE)
+					|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCECLEANSE)) {
 
-		// Based on the action listed, react appropriately.
-		if (ActionType.valueOf(configAction).equals(ActionType.CLEANSE)
-				|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCECLEANSE)) {
-
-			// Remove the glow from the player.
-			plugin.clearGlow(event.getPlayer());
-		}
-
-		// Based on the action listed, react appropriately.
-		if (ActionType.valueOf(configAction).equals(ActionType.ANNOUNCE)
-				|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCECLEANSE)
-				|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCEGLOW)) {
-
-			// If there is no message, put a warning in the log.
-			if (!plugin.getConfig().contains(easyPath + ".MESSAGE")) {
-				plugin.getLogger().log(Level.WARNING,
-						easyPath + " was set to announce, but no message has been set! Fix in the config.");
-				return;
+				// Remove the glow from the player.
+				plugin.clearGlow(event.getPlayer());
 			}
 
-			// Verify the message.
-			configMessage = plugin.getConfig()
-					.getString(easyPath + ".MESSAGE");
+			// Based on the action listed, react appropriately.
+			if (ActionType.valueOf(configAction).equals(ActionType.ANNOUNCE)
+					|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCECLEANSE)
+					|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCEGLOW)) {
 
-			// Replace components of the message.
-			if (configMessage.contains("<player>") || configMessage.contains("<p>")) {
-				configMessage = configMessage.replaceAll("<player>", event.getPlayer().toString());
-				configMessage = configMessage.replaceAll("<p>", event.getPlayer().toString());
+				// If there is no message, put a warning in the log.
+				if (!plugin.getConfig().contains(easyPath + ".MESSAGE")) {
+					plugin.getLogger().log(Level.WARNING,
+							easyPath + " was set to announce, but no message has been set! Fix in the config.");
+					return;
+				}
+
+				// Verify the message.
+				configMessage = plugin.getConfig().getString(easyPath + ".MESSAGE");
+
+				// Replace components of the message.
+				if (configMessage.contains("<player>") || configMessage.contains("<p>")) {
+					configMessage = configMessage.replaceAll("<player>", event.getPlayer().getDisplayName());
+					configMessage = configMessage.replaceAll("<p>", event.getPlayer().getDisplayName());
+				}
+
+				if (configMessage.contains("<cause>") || configMessage.contains("<c>")) {
+					configMessage = configMessage.replaceAll("<cause>", event.getItem().getType().toString());
+					configMessage = configMessage.replaceAll("<c>", event.getItem().getType().toString());
+				}
+
+				// Broadcast the message.
+				plugin.getServer().broadcastMessage(configMessage);
 			}
-
-			if (configMessage.contains("<cause>") || configMessage.contains("<c>")) {
-				configMessage = configMessage.replaceAll("<cause>", event.getItem().getType().toString());
-				configMessage = configMessage.replaceAll("<c>", event.getItem().getType().toString());
-			}
-
-			// Broadcast the message.
-			plugin.getServer().broadcastMessage(configMessage);
 		}
 	}
 
 	// When an item is eaten, check if a glow should be applied and apply it!
 	@EventHandler
 	public void onItemPickup(EntityPickupItemEvent event) {
-
-		if (event.getEntityType() != EntityType.PLAYER)
-			return;
+		
+		// Prevent other entities from glowing for picked up items.
+		if (!event.getEntityType().equals(EntityType.PLAYER)) return;
 
 		// Set the main path for convenience, and other variables.
-		String easyPath = "ITEMPICKUP." + event.getItem().getType().toString();
+		String easyPath = "ITEMPICKUP." + event.getItem().getItemStack().getType().toString();
 		String configColor, configDuration, configMessage, configAction = "";
 
 		// Action handling here. Check for an action.
 		if (plugin.getConfig().contains(easyPath + ".ACTION")) {
-
+			
 			// Determine whether the action is valid.
 			try {
-				configAction = ActionType.valueOf(easyPath + ".ACTION").toString();
+				configAction = ActionType.valueOf(plugin.getConfig().getString(easyPath + ".ACTION")).toString();
 			} catch (IllegalArgumentException | NullPointerException exception) {
 				if (exception instanceof IllegalArgumentException) {
 					plugin.getLogger().log(Level.WARNING, "The action listed in the config file for " + easyPath
@@ -305,13 +295,6 @@ public final class PlayerListener implements Listener {
 			// Based on the action listed, react appropriately.
 			if (ActionType.valueOf(configAction).equals(ActionType.GLOW)
 					|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCEGLOW)) {
-
-				// Verify that the glow settings exist.
-				if (plugin.getConfig().contains(easyPath + ".GLOWSETTINGS")) {
-					plugin.getLogger().log(Level.WARNING, "There are no glow settings listed in the config file for "
-							+ easyPath + ". Fix in the config.");
-					return;
-				}
 
 				// Check if color is listed in the glow settings.
 				if (!plugin.getConfig().contains(easyPath + ".GLOWSETTINGS.COLOR")) {
@@ -357,52 +340,51 @@ public final class PlayerListener implements Listener {
 
 			}
 
-		}
+			// Based on the action listed, react appropriately.
+			if (ActionType.valueOf(configAction).equals(ActionType.CLEANSE)
+					|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCECLEANSE)) {
 
-		// Based on the action listed, react appropriately.
-		if (ActionType.valueOf(configAction).equals(ActionType.CLEANSE)
-				|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCECLEANSE)) {
-
-			// Remove the glow from the player.
-			plugin.clearGlow((Player) event.getEntity());
-		}
-
-		// Based on the action listed, react appropriately.
-		if (ActionType.valueOf(configAction).equals(ActionType.ANNOUNCE)
-				|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCECLEANSE)
-				|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCEGLOW)) {
-
-			// If there is no message, put a warning in the log.
-			if (!plugin.getConfig().contains(easyPath + ".MESSAGE")) {
-				plugin.getLogger().log(Level.WARNING,
-						easyPath + " was set to announce, but no message has been set! Fix in the config.");
-				return;
+				// Remove the glow from the player.
+				plugin.clearGlow((Player) event.getEntity());
 			}
 
-			// Verify the message.
-			configMessage = plugin.getConfig()
-					.getString(easyPath + ".MESSAGE");
+			// Based on the action listed, react appropriately.
+			if (ActionType.valueOf(configAction).equals(ActionType.ANNOUNCE)
+					|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCECLEANSE)
+					|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCEGLOW)) {
 
-			// Replace components of the message.
-			if (configMessage.contains("<player>") || configMessage.contains("<p>")) {
-				configMessage = configMessage.replaceAll("<player>", event.getEntity().toString());
-				configMessage = configMessage.replaceAll("<p>", event.getEntity().toString());
+				// If there is no message, put a warning in the log.
+				if (!plugin.getConfig().contains(easyPath + ".MESSAGE")) {
+					plugin.getLogger().log(Level.WARNING,
+							easyPath + " was set to announce, but no message has been set! Fix in the config.");
+					return;
+				}
+
+				// Verify the message.
+				configMessage = plugin.getConfig().getString(easyPath + ".MESSAGE");
+
+				// Replace components of the message.
+				if (configMessage.contains("<player>") || configMessage.contains("<p>")) {
+					configMessage = configMessage.replaceAll("<player>", event.getEntity().getName());
+					configMessage = configMessage.replaceAll("<p>", event.getEntity().getName());
+				}
+
+				if (configMessage.contains("<cause>") || configMessage.contains("<c>")) {
+					configMessage = configMessage.replaceAll("<cause>", event.getItem().getItemStack().getType().toString());
+					configMessage = configMessage.replaceAll("<c>", event.getItem().getItemStack().getType().toString());
+				}
+
+				// Broadcast the message.
+				plugin.getServer().broadcastMessage(configMessage);
+
 			}
-
-			if (configMessage.contains("<cause>") || configMessage.contains("<c>")) {
-				configMessage = configMessage.replaceAll("<cause>", event.getItem().getType().toString());
-				configMessage = configMessage.replaceAll("<c>", event.getItem().getType().toString());
-			}
-
-			// Broadcast the message.
-			plugin.getServer().broadcastMessage(configMessage);
 		}
 	}
-	
+
 	// When a player teleports, check if a glow should be applied and apply it!
 	@EventHandler
 	public void onPlayerTeleport(PlayerTeleportEvent event) {
-		
+
 		// Set the main path for convenience, and other variables.
 		String easyPath = "TELEPORT." + event.getCause().toString();
 		String configColor, configDuration, configMessage, configAction = "";
@@ -412,7 +394,7 @@ public final class PlayerListener implements Listener {
 
 			// Determine whether the action is valid.
 			try {
-				configAction = ActionType.valueOf(easyPath + ".ACTION").toString();
+				configAction = ActionType.valueOf(plugin.getConfig().getString(easyPath + ".ACTION")).toString();
 			} catch (IllegalArgumentException | NullPointerException exception) {
 				if (exception instanceof IllegalArgumentException) {
 					plugin.getLogger().log(Level.WARNING, "The action listed in the config file for " + easyPath
@@ -428,13 +410,6 @@ public final class PlayerListener implements Listener {
 			// Based on the action listed, react appropriately.
 			if (ActionType.valueOf(configAction).equals(ActionType.GLOW)
 					|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCEGLOW)) {
-
-				// Verify that the glow settings exist.
-				if (plugin.getConfig().contains(easyPath + ".GLOWSETTINGS")) {
-					plugin.getLogger().log(Level.WARNING, "There are no glow settings listed in the config file for "
-							+ easyPath + ". Fix in the config.");
-					return;
-				}
 
 				// Check if color is listed in the glow settings.
 				if (!plugin.getConfig().contains(easyPath + ".GLOWSETTINGS.COLOR")) {
@@ -480,54 +455,53 @@ public final class PlayerListener implements Listener {
 
 			}
 
-		}
+			// Based on the action listed, react appropriately.
+			if (ActionType.valueOf(configAction).equals(ActionType.CLEANSE)
+					|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCECLEANSE)) {
 
-		// Based on the action listed, react appropriately.
-		if (ActionType.valueOf(configAction).equals(ActionType.CLEANSE)
-				|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCECLEANSE)) {
-
-			// Remove the glow from the player.
-			plugin.clearGlow(event.getPlayer());
-		}
-
-		// Based on the action listed, react appropriately.
-		if (ActionType.valueOf(configAction).equals(ActionType.ANNOUNCE)
-				|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCECLEANSE)
-				|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCEGLOW)) {
-
-			// If there is no message, put a warning in the log.
-			if (!plugin.getConfig().contains(easyPath + ".MESSAGE")) {
-				plugin.getLogger().log(Level.WARNING,
-						easyPath + " was set to announce, but no message has been set! Fix in the config.");
-				return;
+				// Remove the glow from the player.
+				plugin.clearGlow(event.getPlayer());
 			}
 
-			// Verify the message.
-			configMessage = plugin.getConfig()
-					.getString(easyPath + ".MESSAGE");
+			// Based on the action listed, react appropriately.
+			if (ActionType.valueOf(configAction).equals(ActionType.ANNOUNCE)
+					|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCECLEANSE)
+					|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCEGLOW)) {
 
-			// Replace components of the message.
-			if (configMessage.contains("<player>") || configMessage.contains("<p>")) {
-				configMessage = configMessage.replaceAll("<player>", event.getPlayer().toString());
-				configMessage = configMessage.replaceAll("<p>", event.getPlayer().toString());
+				// If there is no message, put a warning in the log.
+				if (!plugin.getConfig().contains(easyPath + ".MESSAGE")) {
+					plugin.getLogger().log(Level.WARNING,
+							easyPath + " was set to announce, but no message has been set! Fix in the config.");
+					return;
+				}
+
+				// Verify the message.
+				configMessage = plugin.getConfig().getString(easyPath + ".MESSAGE");
+
+				// Replace components of the message.
+				if (configMessage.contains("<player>") || configMessage.contains("<p>")) {
+					configMessage = configMessage.replaceAll("<player>", event.getPlayer().getDisplayName());
+					configMessage = configMessage.replaceAll("<p>", event.getPlayer().getDisplayName());
+				}
+
+				if (configMessage.contains("<cause>") || configMessage.contains("<c>")) {
+					configMessage = configMessage.replaceAll("<cause>", event.getCause().toString());
+					configMessage = configMessage.replaceAll("<c>", event.getCause().toString());
+				}
+
+				// Broadcast the message.
+				plugin.getServer().broadcastMessage(configMessage);
 			}
-
-			if (configMessage.contains("<cause>") || configMessage.contains("<c>")) {
-				configMessage = configMessage.replaceAll("<cause>", event.getCause().toString());
-				configMessage = configMessage.replaceAll("<c>", event.getCause().toString());
-			}
-
-			// Broadcast the message.
-			plugin.getServer().broadcastMessage(configMessage);
 		}
 	}
 
 	// When an entity dies, check if a glow should be applied and apply it!
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent event) {
-		
+
 		// Set the main path for convenience, and other variables.
 		String easyPath = "ENTITYKILLED." + event.getEntityType().toString();
+		plugin.getLogger().log(Level.INFO, "Entity killed had a tpye of " + event.getEntityType());
 		String configColor, configDuration, configMessage, configAction = "";
 
 		// Action handling here. Check for an action.
@@ -535,7 +509,7 @@ public final class PlayerListener implements Listener {
 
 			// Determine whether the action is valid.
 			try {
-				configAction = ActionType.valueOf(easyPath + ".ACTION").toString();
+				configAction = ActionType.valueOf(plugin.getConfig().getString(easyPath + ".ACTION")).toString();
 			} catch (IllegalArgumentException | NullPointerException exception) {
 				if (exception instanceof IllegalArgumentException) {
 					plugin.getLogger().log(Level.WARNING, "The action listed in the config file for " + easyPath
@@ -551,13 +525,6 @@ public final class PlayerListener implements Listener {
 			// Based on the action listed, react appropriately.
 			if (ActionType.valueOf(configAction).equals(ActionType.GLOW)
 					|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCEGLOW)) {
-
-				// Verify that the glow settings exist.
-				if (plugin.getConfig().contains(easyPath + ".GLOWSETTINGS")) {
-					plugin.getLogger().log(Level.WARNING, "There are no glow settings listed in the config file for "
-							+ easyPath + ". Fix in the config.");
-					return;
-				}
 
 				// Check if color is listed in the glow settings.
 				if (!plugin.getConfig().contains(easyPath + ".GLOWSETTINGS.COLOR")) {
@@ -598,50 +565,48 @@ public final class PlayerListener implements Listener {
 				}
 
 				// Set the glow for the player.
-				plugin.setGlow((Player) event.getEntity(), durationVerification.getVerifiedDuration(),
+				plugin.setGlow(event.getEntity().getKiller(), durationVerification.getVerifiedDuration(),
 						ChatColor.valueOf(colorVerification.getVerifiedColor()));
 
 			}
 
-		}
+			// Based on the action listed, react appropriately.
+			if (ActionType.valueOf(configAction).equals(ActionType.CLEANSE)
+					|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCECLEANSE)) {
 
-		// Based on the action listed, react appropriately.
-		if (ActionType.valueOf(configAction).equals(ActionType.CLEANSE)
-				|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCECLEANSE)) {
-
-			// Remove the glow from the player.
-			plugin.clearGlow((Player) event.getEntity());
-		}
-
-		// Based on the action listed, react appropriately.
-		if (ActionType.valueOf(configAction).equals(ActionType.ANNOUNCE)
-				|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCECLEANSE)
-				|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCEGLOW)) {
-
-			// If there is no message, put a warning in the log.
-			if (!plugin.getConfig().contains(easyPath + ".MESSAGE")) {
-				plugin.getLogger().log(Level.WARNING,
-						easyPath + " was set to announce, but no message has been set! Fix in the config.");
-				return;
+				// Remove the glow from the player.
+				plugin.clearGlow(event.getEntity().getKiller());
 			}
 
-			// Verify the message.
-			configMessage = plugin.getConfig()
-					.getString(easyPath + ".MESSAGE");
+			// Based on the action listed, react appropriately.
+			if (ActionType.valueOf(configAction).equals(ActionType.ANNOUNCE)
+					|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCECLEANSE)
+					|| ActionType.valueOf(configAction).equals(ActionType.ANNOUNCEGLOW)) {
 
-			// Replace components of the message.
-			if (configMessage.contains("<player>") || configMessage.contains("<p>")) {
-				configMessage = configMessage.replaceAll("<player>", event.getEntity().toString());
-				configMessage = configMessage.replaceAll("<p>", event.getEntity().toString());
+				// If there is no message, put a warning in the log.
+				if (!plugin.getConfig().contains(easyPath + ".MESSAGE")) {
+					plugin.getLogger().log(Level.WARNING,
+							easyPath + " was set to announce, but no message has been set! Fix in the config.");
+					return;
+				}
+
+				// Verify the message.
+				configMessage = plugin.getConfig().getString(easyPath + ".MESSAGE");
+
+				// Replace components of the message.
+				if (configMessage.contains("<player>") || configMessage.contains("<p>")) {
+					configMessage = configMessage.replaceAll("<player>", event.getEntity().getKiller().getDisplayName());
+					configMessage = configMessage.replaceAll("<p>", event.getEntity().getKiller().getDisplayName());
+				}
+
+				if (configMessage.contains("<cause>") || configMessage.contains("<c>")) {
+					configMessage = configMessage.replaceAll("<cause>", event.getEntityType().toString());
+					configMessage = configMessage.replaceAll("<c>", event.getEntityType().toString());
+				}
+
+				// Broadcast the message.
+				plugin.getServer().broadcastMessage(configMessage);
 			}
-
-			if (configMessage.contains("<cause>") || configMessage.contains("<c>")) {
-				configMessage = configMessage.replaceAll("<cause>", event.getEntityType().toString());
-				configMessage = configMessage.replaceAll("<c>", event.getEntityType().toString());
-			}
-
-			// Broadcast the message.
-			plugin.getServer().broadcastMessage(configMessage);
 		}
 	}
 }

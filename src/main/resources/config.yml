@@ -17,6 +17,8 @@
 # |                                Use entity types from this list:                                 |
 # |                     https://jd.bukkit.org/org/bukkit/entity/EntityType.html                     |
 # |           All durations should be set between 0-1500, using -1 for infinite duration.           |
+# |     Having a <player> or <p> in your message will be replaced with the player name in-game.     |
+# |  Having a <cause> or <c> in your message will be replaced with the cause of the event in-game.  |
 # |                                                                                                 |
 # |-------------------------------------------------------------------------------------------------|
 #
